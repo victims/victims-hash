@@ -1,8 +1,9 @@
 victims-hash
 =============
 
-Python tools to read inspect binary/language artifacts (.jar, .class)
+Hashing mechanism used by victims to produce a unique fingerprint for a
+given archive. Currently supports .jar, .gem, .egg files.
 
-e.g. 
-from victims\_hash.java import fingerprint
-print fingerprint.create("file.jar")
+from victims_hash.fingerprint import fingerprint
+data = fingerprint('file.jar')
+
