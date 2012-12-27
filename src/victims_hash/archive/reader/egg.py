@@ -6,7 +6,6 @@ from victims_hash.archive.reader import ArchiveReader
 
 class EggReader(ArchiveReader):
 
-    # TODO
     def readinfo(self, hints={}):
         """
         Extract meta information from the archive.
@@ -18,8 +17,11 @@ class EggReader(ArchiveReader):
         metadata = {}
 
         with zipfile.ZipFile(self.io) as archive:
-            for filename in archive.namelist():
-                pass
+            with archive.open('EGG-INFO/PKG-INFO') as pkg_info:
+                for line in pkg_info.readlines():
+                    key, value = line.split(': ', 1)
+                    metadata[key] = value[:-1]
+        return metadata
 
     def readfiles(self):
         """
