@@ -31,8 +31,11 @@ class Archive(object):
             for (file, content) in self.reader.readfiles():
                 h = hashlib.new(algorithm)
                 h.update(content)
-                files[file] = h.hexdigest()
-                combined.update(files[file])
+
+                # mongo doesn't like '.' in keyname
+                key = file.replace('.', '[dot]')
+                files[key] = h.hexdigest()
+                combined.update(files[key])
 
             hashes[algorithm] = { 
                 "combined"  : combined.hexdigest(), 
