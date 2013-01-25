@@ -11,7 +11,7 @@ class Archive(object):
         """
         Read all metadata associated with this archive 
         """
-
+        meta = { "meta" : self.reader.readinfo() }
         return {
             "meta" : self.reader.readinfo()
         }
@@ -21,7 +21,7 @@ class Archive(object):
         Create a fingerprint for this archive
         """
 
-        hashes = {}
+        hashes = [] 
         
         for algorithm in self.algorithms: 
             
@@ -32,15 +32,15 @@ class Archive(object):
                 h = hashlib.new(algorithm)
                 h.update(content)
 
-                # mongo doesn't like '.' in keyname
-                key = file.replace('.', '[dot]')
-                files[key] = h.hexdigest()
-                combined.update(files[key])
+                checksum = h.hexdigest() 
+                files[checksum] = file
+                combined.update(checksum)
 
-            hashes[algorithm] = { 
+            hashes.append( { 
+                "algorithm" : algorithm, 
                 "combined"  : combined.hexdigest(), 
                 "files"     : files
-            }
+            })
 
         return {
             "hashes": hashes

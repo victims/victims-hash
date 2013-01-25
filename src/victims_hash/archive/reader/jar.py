@@ -60,9 +60,6 @@ def read_pom_properties(properties):
 
     return metadata
 
-def mongo_safe(name):
-    return name.replace('.', '[dot]')
-    
 class JarReader(ArchiveReader):
 
     def readinfo(self, hints={}):
@@ -73,21 +70,25 @@ class JarReader(ArchiveReader):
            - `hints`: specify things to look for if available.
         """
         self.io.seek(0)
-        metadata = {}
+        metadata = []
 
         with zipfile.ZipFile(self.io) as archive:
     
             manifest_file = "META-INF/MANIFEST.MF"
             with archive.open(manifest_file) as manifest:
-                metadata[mongo_safe(manifest_file)] = read_manifest(manifest)
+                metadata.append({
+                    "filename"  : manifest_file,
+                    "properties": read_manifest(manifest)})
 
-            pom_properties_file = filter(lambda x: x.endswith('pom.properties'),\
+            pom_properties = filter(lambda x: x.endswith('pom.properties'),\
                 archive.namelist())
 
-            if len(pom_properties_file) > 0:
-                pom_properties = pom_properties_file.pop(0)
-                with archive.open(pom_properties) as properties: 
-                    metadata[mongo_safe(pom_properties)] = read_pom_properties(properties)
+            if len(pom_properties) > 0:
+                pom = pom_properties.pop(0)
+                with archive.open(pom) as properties: 
+                    metadata.append({
+                        "filename" : pom, 
+                        "properties" : read_pom_properties(properties)})
 
         return metadata
 
