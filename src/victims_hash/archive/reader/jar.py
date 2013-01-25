@@ -75,17 +75,18 @@ class JarReader(ArchiveReader):
 
         with zipfile.ZipFile(self.io) as archive:
 
-            pom_properties = filter(lambda x: x.endswith('pom.properties'),\
-                archive.namelist()).pop(0)
-
-            with archive.open(pom_properties) as properties: 
-                metadata.update(read_pom_properties(properties))
-
             with archive.open("META-INF/MANIFEST.MF") as manifest:
                 metadata.update(read_manifest(manifest))
 
+            pom_properties_file = filter(lambda x: x.endswith('pom.properties'),\
+                archive.namelist())
+
+            if len(pom_properties_file) > 0:
+                with archive.open(pom_properties_file.pop(0)) as properties: 
+                    metadata.update(read_pom_properties(properties))
+
         return metadata
-            
+
     def readfiles(self):
         """
         Read files within the archive and return their content
