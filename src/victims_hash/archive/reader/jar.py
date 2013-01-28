@@ -1,4 +1,5 @@
 
+import re
 import zipfile
 import javaclass
 
@@ -11,6 +12,7 @@ except ImportError:
 
 
 def read_manifest(manifest):
+
     """
     Extract the information from the MANIFEST.MF file included with 
     the JAR file. 
@@ -20,6 +22,8 @@ def read_manifest(manifest):
     """
 
     metadata = {}
+    metadata_whitelist = re.compile("^([\w]+-)+\w+$")
+
     for line in manifest.readlines():
 
         if ':' in line:
@@ -35,7 +39,8 @@ def read_manifest(manifest):
         else:
             metadata[keyword] += line.rstrip()
  
-    return metadata
+    # Filter out unwanted keys
+    return dict((k, v) for k,v in metadata.iteritems() if metadata_whitelist.match(k) != None)
 
 
 def read_pom_properties(properties):
@@ -48,6 +53,13 @@ def read_pom_properties(properties):
         - `properties`: File like object to extract the metadata from
     """
 
+    # The only keys we allow / care about
+    pom_properties_whitelist = [
+        "groupId",
+        "artifactId",
+        "version"
+    ]
+
     metadata = {}
 
     for line in properties: 
@@ -56,7 +68,8 @@ def read_pom_properties(properties):
             continue
 
         key, sep, value = line.partition('=')
-        metadata[key] = value.rstrip()
+        if key in pom_properties_whitelist:
+            metadata[key] = value.rstrip()
 
     return metadata
 
