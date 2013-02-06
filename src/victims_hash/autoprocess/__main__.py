@@ -42,7 +42,7 @@ def main():
     """
     Main entry point.
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog="victims_hash.autoprocess")
     parser.add_argument(
         '-w', '--workers', default=2, type=int)
     parser.add_argument(
