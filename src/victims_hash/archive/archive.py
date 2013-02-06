@@ -21,7 +21,7 @@ class Archive(object):
         Create a fingerprint for this archive
         """
 
-        hashes = [] 
+        hashes = {} 
         
         for algorithm in self.algorithms: 
             
@@ -36,11 +36,10 @@ class Archive(object):
                 files[checksum] = file
                 combined.update(checksum)
 
-            hashes.append( { 
-                "algorithm" : algorithm, 
-                "combined"  : combined.hexdigest(), 
-                "files"     : files
-            })
+            hashes[algorithm] = {
+                    "combined"  : combined.hexdigest(), 
+                    "files"     : files
+            }
 
         return {
             "hashes": hashes
