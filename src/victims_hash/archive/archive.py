@@ -14,10 +14,10 @@ class Archive(object):
             "meta" : self.reader.readinfo()
         }
 
-    def filehash(self):
+    def filehash(self, algorithm):
         try:
             self.reader.io.seek(0)
-            digest = hashlib.sha512()
+            digest = hashlib.new(algorithm)
             for buff in iter(self.reader.io.read, b''):
                 digest.update(buff)
             return digest.hexdigest()
@@ -31,11 +31,12 @@ class Archive(object):
         Create a fingerprint for this archive
         """
         hashes = {}
+        filehash = ""
 
         for algorithm in self.algorithms:
 
             files = {}
-            combined = hashlib.new(algorithm)
+            combined = self.filehash(algorithm)
 
             for (filename, content) in self.reader.readfiles():
                 h = hashlib.new(algorithm)
@@ -43,14 +44,16 @@ class Archive(object):
 
                 checksum = h.hexdigest()
                 files[checksum] = filename
-                combined.update(checksum)
+
+            if algorithm == "sha512":
+                filehash = combined
 
             hashes[algorithm] = {
-                    "combined"  : combined.hexdigest(),
+                    "combined"  : combined,
                     "files"     : files
             }
 
         return {
-            "hash": self.filehash(),
+            "hash": filehash,
             "hashes": hashes
         }
