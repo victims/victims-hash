@@ -1,9 +1,7 @@
 language: python
 python:
   - "2.7"
-services:
-before_script:
 install:
-script:
+  - pip install -e . --use-mirrors
 notifications:
   email: false
