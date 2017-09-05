@@ -1,4 +1,4 @@
-
+from json import dumps
 from archive.archive import Archive
 from archive.reader.jar import JarReader
 from archive.reader.gem import GemReader
@@ -23,7 +23,7 @@ def fingerprint(file, io=None):
 
         if not archive_instance:
             raise NotImplemtedError("No support for %s files." % file)
-        return archive_instance
+        return dumps(archive_instance)
 
     except Exception, ex:
         # Blind raising ...
